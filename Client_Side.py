@@ -1,6 +1,8 @@
 import socket
+import mimetypes
 import os
 
+# close isn't working
 
 class Client:
     def __init__(self, host: str, port: int):
@@ -9,6 +11,7 @@ class Client:
         self.__client = None
         self.__file_size = 20_971_520  # 20MB
 
+    # directing the command to the appropriate function
     def action(self, command: str, path: str) -> None:
         if command == 'POST':
             self.__post_file(path)
@@ -18,27 +21,35 @@ class Client:
             print('Invalid Command')
 
     def __post_file(self, path: str) -> None:
+        # Check if the client directory exists, if not create it
         if not os.path.exists('Client_Directory'):
             os.makedirs('Client_Directory')
 
         file_name = os.path.basename(path)
+        # Guess the content type of the file
+        content_type, _ = mimetypes.guess_type(file_name)
         with open(os.path.join('Client_Directory', file_name), 'rb') as file:
             file_data = file.read()
-        request_header = f"POST /{file_name} HTTP/1.1\r\nContent-Length: {len(file_data)}\r\n\r\n"
+        # Create the request header to send to the server
+        request_header = f"POST /{file_name} HTTP/1.1\r\nContent-Length: {len(file_data)}\r\nContent-Type: {content_type}\r\n\r\n"
 
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as self.__client:
             self.__client.connect((self.__host, self.__port))
+            # Send the request header and the file data to the server
             self.__client.sendall(request_header.encode('utf-8') + file_data)
             response = self.__client.recv(self.__file_size)
             print(response.decode('utf-8'))
 
     def __get_file(self, file_name: str) -> None:
+        # Check if the client directory exists, if not create it
         if not os.path.exists('Client_Directory'):
             os.makedirs('Client_Directory')
 
+        # Create the request header to send to the server
         request_header = f"GET /{file_name} HTTP/1.1\r\n\r\n"
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as self.__client:
             self.__client.connect((self.__host, self.__port))
+            # Send the request header to the server to get the file/img
             self.__client.sendall(request_header.encode('utf-8'))
             response = self.__client.recv(self.__file_size)
 
@@ -47,6 +58,7 @@ class Client:
                 print('Error in response format')
                 return
 
+            # Get the header and the body of the response separately
             header = response[:header_end].decode('utf-8')
             body = response[header_end + 4:]
 
