@@ -81,6 +81,7 @@ if __name__ == '__main__':
     while True:
         client_command = input('Enter Command: ').upper()
         if client_command == 'CLOSE':
+            client.close()
             break
         if client_command not in ['POST', 'GET']:
             print('Invalid Command')

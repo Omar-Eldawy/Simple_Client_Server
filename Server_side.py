@@ -1,9 +1,11 @@
 import socket
 import threading
 import mimetypes
+import time
 import os
 
-file_size = 20_971_520  # 20MB
+file_size = 20_971_520  # 20 MB
+timeout_duration = 60  # 60 seconds
 
 def parse_http_request(request):
     headers = {}
@@ -76,11 +78,26 @@ def handle_get_request(header, client_socket):
 
 
 def handle_client(client_socket, client_address):
+    last_request_time = time.time()  # track the last request time
+    
     try:
         while True:
-            request = client_socket.recv(file_size)
-            if not request:  # Check for an empty request
+            # Check if timeout has expired
+            if time.time() - last_request_time > timeout_duration:
+                print(f"Closing connection to {client_address} due to inactivity.")
+                break
+
+            client_socket.settimeout(timeout_duration)  # timeout for recv
+            try:
+                request = client_socket.recv(file_size)
+            except socket.timeout:
+                print(f"Connection to {client_address} timed out.")
+                break  # timeout expired
+
+            if not request:  # If request is empty, continue the loop
                 continue
+            
+            last_request_time = time.time()  # reset timer on each new request
             
             body_start_index = request.find(b"\r\n\r\n") + 4    # find the end of the header
             header = request[:body_start_index].decode("utf-8") # decode the bytes to string
