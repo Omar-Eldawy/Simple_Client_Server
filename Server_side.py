@@ -55,8 +55,6 @@ def handle_post_request(header, req_body, client_socket):
 def handle_get_request(header, client_socket):
     requested_file = header.split(" ")[1]
     print(f"Requested file: {requested_file}")
-    if requested_file == '/':
-        requested_file = '/index.html'
 
     file_path = requested_file.lstrip('/') # remove the leading forward slash to get the current directory
 
