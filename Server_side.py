@@ -1,6 +1,7 @@
 import socket
 import threading
 import mimetypes
+import os
 
 
 def handle_post_request(headers, client_socket):
@@ -23,14 +24,14 @@ def handle_post_request(headers, client_socket):
     
     if content_type == "image/png":
         uploaded_file_name = "uploaded_image.png"
-        with open(uploaded_file_name, "wb") as write_file:
+        with open(os.path.join('Server_Directory', uploaded_file_name), "wb") as write_file:
             write_file.write(request_body)
     else:
+        uploaded_file_name = headers[0].split(" ")[1].lstrip("/")
         lines = request_body.decode("utf-8").splitlines()
-        uploaded_file_name = lines[0] if lines else "uploaded_file.txt"  # assuming the first line of the request body is the file name
         uploaded_file_content = "\n".join(lines[1:])
         
-        with open(uploaded_file_name, "w") as write_file:
+        with open(os.path.join('Server_Directory', uploaded_file_name), "wb") as write_file:
             write_file.write(uploaded_file_content)
     
     response = "HTTP/1.1 200 OK\r\n\r\nRequest handled successfully"
@@ -38,23 +39,23 @@ def handle_post_request(headers, client_socket):
 
 
 def handle_get_request(headers, client_socket):
-    requestedFile = headers[0].split(" ")[1]
-    print(f"Requested file: {requestedFile}")
-    if requestedFile == '/':
-        requestedFile = '/index.html'
+    requested_file = headers[0].split(" ")[1]
+    print(f"Requested file: {requested_file}")
+    if requested_file == '/':
+        requested_file = '/index.html'
     
-    file_path = requestedFile.lstrip('/') # remove the leading forward slash to get the current directory
+    file_path = requested_file.lstrip('/') # remove the leading forward slash to get the current directory
     
     try:
         content_type, _ = mimetypes.guess_type(file_path)
         if content_type is None:
             content_type = 'application/octet-stream'  # raw data(binary data)
-        with open(file_path, 'rb') as read_file:
+        with open(os.path.join('Server_Directory', file_path), 'rb') as read_file:
             file_content = read_file.read()
-        response = f'HTTP/1.0 200 OK\r\nContent-Type: {content_type}\r\n\r\n'.encode("utf-8") + file_content
+        response = f'HTTP/1.1 200 OK\r\nContent-Type: {content_type}\r\n\r\n'.encode("utf-8") + file_content
         
     except FileNotFoundError:
-        print(f"File not found: {requestedFile}")
+        print(f"File not found: {requested_file}")
         response = "HTTP/1.1 404 Not Found\r\n\r\nFile Not Found"
     
     client_socket.send(response if isinstance(response, bytes) else response.encode("utf-8"))
@@ -88,7 +89,7 @@ def handle_client(client_socket, client_address):
 
 def run_server():
     server_ip = "127.0.0.1"
-    port = 8000
+    port = 8080
     try:
         server = socket.socket(socket.AF_INET, socket.SOCK_STREAM) # create a TCP socket
         server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1) # allow the server to reuse the same address

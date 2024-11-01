@@ -51,8 +51,9 @@ class Client:
         self.__client.close()
 
 if __name__ == '__main__':
+    server_ip = "127.0.0.1"
     server_port = 8080
-    client = Client(socket.gethostbyname(socket.gethostname()), server_port)
+    client = Client(server_ip, server_port)
     while True:
         client_command = input('Enter Command: ')
         if client_command == 'close':
