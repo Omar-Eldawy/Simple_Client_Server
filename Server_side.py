@@ -132,7 +132,7 @@ def run_server():
     port = 8080
     try:
         server = socket.socket(socket.AF_INET, socket.SOCK_STREAM) # create a TCP socket
-        server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1) # allow the server to reuse the same address
+        server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 10) # allow the server to reuse the same address
         server.bind((server_ip, port))
         server.listen()
         print(f"Listening on {server_ip}:{port}")

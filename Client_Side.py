@@ -2,6 +2,9 @@ import socket
 import mimetypes
 import os
 
+import Utilities
+from Utilities import parse_args
+
 
 class Client:
     def __init__(self, host: str, port: int):
@@ -12,13 +15,36 @@ class Client:
         self.__file_size = 20_971_520  # 20MB
 
     # directing the command to the appropriate function
-    def action(self, command: str, path: str) -> None:
-        if command == 'POST':
-            self.__post_file(path)
-        elif command == 'GET':
-            self.__get_file(path)
-        else:
-            print('Invalid Command')
+    def action(self, user_command: str, path: str) -> bool:
+        try:
+            if user_command == 'POST':
+                self.__post_file(path)
+            elif user_command == 'GET':
+                self.__get_file(path)
+            else:
+                print('Invalid Command')
+            return True
+
+        except ConnectionRefusedError:
+            print("Connection refused: The server is not listening on the specified IP and port.")
+            return False
+
+        except socket.gaierror:
+            print("Address-related error: The hostname or IP address could not be resolved.")
+            return False
+
+        except BrokenPipeError:
+            print("Broken pipe: The connection was closed by the server unexpectedly.")
+            return False
+
+        except TimeoutError:
+            print("Timeout: The connection attempt or send operation timed out.")
+            return False
+
+        except OSError as e:
+            print(f"OS error: {e}")
+            return False
+
 
     def __post_file(self, path: str) -> None:
         # Check if the client directory exists, if not create it
@@ -29,7 +55,7 @@ class Client:
         if not os.path.exists(os.path.join('Client_Directory', file_name)):
             print(f"Error: File '{file_name}' does not exist.")
             return
-        
+
         # Guess the content type of the file
         content_type, _ = mimetypes.guess_type(file_name)
         with open(os.path.join('Client_Directory', file_name), 'rb') as file:
@@ -72,22 +98,24 @@ class Client:
                 print('File downloaded successfully')
 
     def close(self) -> None:
-        self.__client.send("CLOSE".encode('utf-8'))
         self.__client.close()
+
+    def send_close_message(self):
+        self.__client.send("CLOSE".encode('utf-8'))
 
 
 if __name__ == '__main__':
-    server_ip = "127.0.0.1"
-    server_port = 8080
-    client = Client(server_ip, server_port)
-    while True:
-        user_input = input('Enter Command: ')
-        client_command = user_input.split(' ', 1)
-        client_command[0] = client_command[0].upper()
-        if client_command[0] == 'CLOSE':
+    args = parse_args()
+    commands = Utilities.read_file('Client_Commands.txt')
+    client = Client(args.server_ip, args.port_number)
+    for command in commands:
+        client_command = Utilities.handle_command_parsing(command)
+        if client_command[0].upper() == 'CLOSE':
+            client.send_close_message()
             break
-        if client_command[0] not in ['POST', 'GET']:
+        if client_command[0].upper() not in ['POST', 'GET']:
             print('Invalid Command')
             continue
-        client.action(client_command[0], client_command[1])
+        if not client.action(client_command[0].upper(), client_command[1]):
+            break
     client.close()

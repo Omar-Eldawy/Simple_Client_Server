@@ -1,0 +1,6 @@
+GET index.html
+POST Adel.jpg
+GET Adel.jpg
+POST Emam.jpeg
+GET walter_white.jpg
+POST index.html
