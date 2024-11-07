@@ -22,3 +22,9 @@ def parse_args():
     parser.add_argument('server_ip', type=str, default='127.0.0.1')
     parser.add_argument('port_number', type=int, default=80)
     return parser.parse_args()
+
+
+def parse_args_port():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('port_number', type=int, default=80)
+    return parser.parse_args()
