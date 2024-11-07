@@ -14,7 +14,7 @@ class Simulation:
         pointer = 0
         for i in self.__num_clients:
             start = time.time_ns()
-            for _ in range(10):
+            for _ in range(3):
                 with concurrent.futures.ProcessPoolExecutor() as executor:
                     futures = [executor.submit(self.run_client) for _ in range(i)]
 

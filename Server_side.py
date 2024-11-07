@@ -4,6 +4,9 @@ import mimetypes
 import time
 import os
 
+import Utilities
+from Utilities import parse_args
+
 file_size = 20_971_520  # 20 MB
 timeout_duration = 60  # 60 seconds
 
@@ -108,7 +111,7 @@ def handle_client(client_socket, client_address):
                 client_socket.send("closed".encode("utf-8"))  # encode the string to bytes before sending
                 break
 
-            print(f"Received from {client_address[0]}:{client_address[1]}: {request}")
+            # print(f"Received from {client_address[0]}:{client_address[1]}: {request}")
             command = header.split(" ")[0]
             # Direct the request to the appropriate handler
             if command == "GET":
@@ -129,10 +132,10 @@ def handle_client(client_socket, client_address):
 
 def run_server():
     server_ip = "127.0.0.1"
-    port = 8080
+    port = Utilities.parse_args_port().port_number
     try:
         server = socket.socket(socket.AF_INET, socket.SOCK_STREAM) # create a TCP socket
-        server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 10) # allow the server to reuse the same address
+        server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1) # allow the server to reuse the same address
         server.bind((server_ip, port))
         server.listen()
         print(f"Listening on {server_ip}:{port}")
