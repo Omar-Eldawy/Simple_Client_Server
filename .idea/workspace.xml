@@ -5,15 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="8f56a3d8-c324-4f76-822a-5f5a49bc65cb" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Simulation/Graphs/Figure_1.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Client_Commands.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Commands/1.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Client_Directory/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/Client_Directory/index.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Client_Side.py" beforeDir="false" afterPath="$PROJECT_DIR$/Client_Side.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Server_Directory/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/Server_Directory/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Server_side.py" beforeDir="false" afterPath="$PROJECT_DIR$/Server_side.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Simulation.py" beforeDir="false" afterPath="$PROJECT_DIR$/Simulation/Simulation.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Utilities.py" beforeDir="false" afterPath="$PROJECT_DIR$/Utilities.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -40,15 +35,15 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "DefaultHtmlFileTemplate": "HTML File",
-    "Python.Simulation.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "master",
-    "last_opened_file_path": "A:/university/year 3/first term/Computer Networks/Programming_Assignments/Client_Server/Simulation_Graphs"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
+    &quot;Python.Simulation.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;last_opened_file_path&quot;: &quot;A:/university/year 3/first term/Computer Networks/Programming_Assignments/Client_Server/Simulation_Graphs&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="A:\university\year 3\first term\Computer Networks\Programming_Assignments\Client_Server\Simulation_Graphs" />
