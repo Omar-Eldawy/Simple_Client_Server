@@ -1,9 +1,10 @@
 import socket
 import mimetypes
 import os
+import sys
 
 import Utilities
-from Utilities import parse_args
+from Utilities import parse_args, validate_file
 
 
 class Client:
@@ -22,29 +23,28 @@ class Client:
             elif user_command == 'GET':
                 self.__get_file(path)
             else:
-                print('Invalid Command')
+                print('Invalid Command', end='\n\n')
             return True
 
         except ConnectionRefusedError:
-            print("Connection refused: The server is not listening on the specified IP and port.")
+            print("Connection refused: The server is not listening on the specified IP and port.", end='\n\n')
             return False
 
         except socket.gaierror:
-            print("Address-related error: The hostname or IP address could not be resolved.")
+            print("Address-related error: The hostname or IP address could not be resolved.", end='\n\n')
             return False
 
         except BrokenPipeError:
-            print("Broken pipe: The connection was closed by the server unexpectedly.")
+            print("Broken pipe: The connection was closed by the server unexpectedly.", end='\n\n')
             return False
 
         except TimeoutError:
-            print("Timeout: The connection attempt or send operation timed out.")
+            print("Timeout: The connection attempt or send operation timed out.", end='\n\n')
             return False
 
         except OSError as e:
-            print(f"OS error: {e}")
+            print(f"OS error: {e}", end='\n\n')
             return False
-
 
     def __post_file(self, path: str) -> None:
         # Check if the client directory exists, if not create it
@@ -53,7 +53,7 @@ class Client:
 
         file_name = os.path.basename(path)
         if not os.path.exists(os.path.join('Client_Directory', file_name)):
-            print(f"Error: File '{file_name}' does not exist.")
+            print(f"Error: File '{file_name}' does not exist.", end='\n\n')
             return
 
         # Guess the content type of the file
@@ -66,7 +66,7 @@ class Client:
         # Send the request header and the file data to the server
         self.__client.sendall(request_header.encode('utf-8') + file_data)
         response = self.__client.recv(self.__file_size)
-        print(response.decode('utf-8'))
+        print(response.decode('utf-8'), end='\n\n')
 
     def __get_file(self, file_name: str) -> None:
         # Check if the client directory exists, if not create it
@@ -76,13 +76,12 @@ class Client:
         # Create the request header to send to the server
         request_header = f"GET /{file_name} HTTP/1.1\r\n\r\n"
 
-        # Send the request header to the server to get the file/img
+        # Send the request header to the server to get the file
         self.__client.sendall(request_header.encode('utf-8'))
         response = self.__client.recv(self.__file_size)
-
         header_end = response.find(b'\r\n\r\n')
         if header_end == -1:
-            print('Error in response format')
+            print('Error in response format', end='\n\n')
             return
 
         # Get the header and the body of the response separately
@@ -90,12 +89,16 @@ class Client:
         body = response[header_end + 4:]
 
         if '404 Not Found' in header:
-            print('File not found on server')
+            print(header)
+            print('File not found on server', end='\n\n')
             return
-        else:
+        elif '200 OK' in header:
+            print(header)
             with open(os.path.join('Client_Directory', file_name), 'wb') as file:
                 file.write(body)
-                print('File downloaded successfully')
+                print('File downloaded successfully', end='\n\n')
+        else:
+            print(header, end='\n\n')
 
     def close(self) -> None:
         self.__client.close()
@@ -106,16 +109,34 @@ class Client:
 
 if __name__ == '__main__':
     args = parse_args()
-    commands = Utilities.read_file('Client_Commands.txt')
     client = Client(args.server_ip, args.port_number)
-    for command in commands:
-        client_command = Utilities.handle_command_parsing(command)
-        if client_command[0].upper() == 'CLOSE':
+    while True:
+        file_path = input('Enter commands file path or Close to terminate:')
+
+        if file_path.upper() == 'CLOSE':
             client.send_close_message()
-            break
-        if client_command[0].upper() not in ['POST', 'GET']:
-            print('Invalid Command')
+            client.close()
+            print('Connection closed')
+            sys.exit(0)
+
+        check_file_path = validate_file(file_path)
+        if check_file_path != 'File is valid':
+            print(check_file_path)
             continue
-        if not client.action(client_command[0].upper(), client_command[1]):
-            break
-    client.close()
+
+        commands = Utilities.read_file(file_path)
+
+        for command in commands:
+            client_command = Utilities.handle_command_parsing(command)
+            if client_command[0].upper() == 'CLOSE':
+                client.send_close_message()
+                client.close()
+                print('Connection closed')
+                sys.exit(0)
+            if client_command[0].upper() not in ['POST', 'GET']:
+                print('Invalid Command')
+                continue
+            if not client.action(client_command[0].upper(), client_command[1]):
+                client.close()
+                print('Connection closed')
+                sys.exit(0)

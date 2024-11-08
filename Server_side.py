@@ -1,14 +1,14 @@
+import mimetypes
+import os
 import socket
 import threading
-import mimetypes
 import time
-import os
 
 import Utilities
-from Utilities import parse_args
 
 file_size = 20_971_520  # 20 MB
 timeout_duration = 60  # 60 seconds
+
 
 def parse_http_request(request):
     headers = {}
@@ -33,9 +33,9 @@ def handle_post_request(header, req_body, client_socket):
         response = "HTTP/1.1 411 Length Required\r\n\r\nContent-Length Required"
         client_socket.send(response.encode("utf-8"))
         return
-    
+
     file_content = req_body
-    
+
     # Receive the file content from the client in chunks of 4096 bytes
     while len(file_content) < content_length:
         data = client_socket.recv(4096)
@@ -61,7 +61,7 @@ def handle_get_request(header, client_socket):
     requested_file = header.split(" ")[1]
     print(f"Requested file: {requested_file}")
 
-    file_path = requested_file.lstrip('/') # remove the leading forward slash to get the current directory
+    file_path = requested_file.lstrip('/')  # remove the leading forward slash to get the current directory
 
     try:
         # Determine the content type of the file
@@ -82,7 +82,7 @@ def handle_get_request(header, client_socket):
 
 def handle_client(client_socket, client_address):
     last_request_time = time.time()  # track the last request time
-    
+
     try:
         while True:
             # Check if timeout has expired
@@ -99,13 +99,13 @@ def handle_client(client_socket, client_address):
 
             if not request:  # If request is empty, continue the loop
                 continue
-            
+
             last_request_time = time.time()  # reset timer on each new request
-            
-            body_start_index = request.find(b"\r\n\r\n") + 4    # find the end of the header
-            header = request[:body_start_index].decode("utf-8") # decode the bytes to string
-            req_body = request[body_start_index:]               # get the request body (bytes)
-            
+
+            body_start_index = request.find(b"\r\n\r\n") + 4  # find the end of the header
+            header = request[:body_start_index].decode("utf-8")  # decode the bytes to string
+            req_body = request[body_start_index:]  # get the request body (bytes)
+
             # Check if the client wants to close the connection
             if request.upper().strip() == "close":
                 client_socket.send("closed".encode("utf-8"))  # encode the string to bytes before sending
@@ -129,13 +129,12 @@ def handle_client(client_socket, client_address):
         print(f"Connection to client {client_address[0]}:{client_address[1]} closed")
 
 
-
 def run_server():
     server_ip = "127.0.0.1"
     port = Utilities.parse_args_port().port_number
     try:
-        server = socket.socket(socket.AF_INET, socket.SOCK_STREAM) # create a TCP socket
-        server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1) # allow the server to reuse the same address
+        server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # create a TCP socket
+        server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)  # allow the server to reuse the same address
         server.bind((server_ip, port))
         server.listen()
         print(f"Listening on {server_ip}:{port}")
@@ -143,11 +142,13 @@ def run_server():
         while True:
             client_socket, client_address = server.accept()
             print(f"Accepted connection from {client_address[0]}:{client_address[1]}")
-            thread = threading.Thread(target=handle_client, args=(client_socket, client_address)) # create a new thread to handle the client
+            thread = threading.Thread(target=handle_client,
+                                      args=(client_socket, client_address))  # create a new thread to handle the client
             thread.start()
     except Exception as e:
         print(f"An error occurred: {e}")
     finally:
         server.close()
+
 
 run_server()

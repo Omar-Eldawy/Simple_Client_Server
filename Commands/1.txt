@@ -1,6 +1,7 @@
 GET index.html
 POST Adel.jpg
 GET Adel.jpg
+Get dola.gif
 POST Emam.jpeg
 GET walter_white.jpg
 POST index.html
