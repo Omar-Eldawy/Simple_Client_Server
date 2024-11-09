@@ -67,16 +67,17 @@ class Client:
         self.__client.sendall(request_header.encode('utf-8') + file_data)
         response = self.__client.recv(self.__file_size)
         print(response.decode('utf-8'), end='\n\n')
-
+        
     def __get_file(self, file_name: str) -> None:
         # Check if the client directory exists, if not create it
         if not os.path.exists('Client_Directory'):
             os.makedirs('Client_Directory')
 
-        # Create the request header to send to the server
-        request_header = f"GET /{file_name} HTTP/1.1\r\n\r\n"
+        # Create the request header, keeping the original file_name (e.g., '/')
+        request_header = f"GET {file_name} HTTP/1.1\r\n\r\n"
+        print("Request Header:", request_header)
 
-        # Send the request header to the server to get the file
+        # Send the request header to the server
         self.__client.sendall(request_header.encode('utf-8'))
         response = self.__client.recv(self.__file_size)
         header_end = response.find(b'\r\n\r\n')
@@ -84,19 +85,29 @@ class Client:
             print('Error in response format', end='\n\n')
             return
 
-        # Get the header and the body of the response separately
+        # Separate the header and the body of the response
         header = response[:header_end].decode('utf-8')
         body = response[header_end + 4:]
 
+        # Handle different server response statuses
         if '404 Not Found' in header:
             print(header)
             print('File not found on server', end='\n\n')
             return
         elif '200 OK' in header:
             print(header)
-            with open(os.path.join('Client_Directory', file_name), 'wb') as file:
-                file.write(body)
-                print('File downloaded successfully', end='\n\n')
+            
+            # Handle the root (/) case by using a different name, like "root_response.html"
+            save_file_name = 'index.html' if file_name == '/' else file_name
+            file_path = os.path.join('Client_Directory', save_file_name)
+
+            # Check if file already exists before writing
+            if not os.path.exists(file_path):
+                with open(file_path, 'wb') as file:
+                    file.write(body)
+                    print(f'File downloaded successfully as {save_file_name}', end='\n\n')
+            else:
+                print(f'File {save_file_name} already exists.', end='\n\n')
         else:
             print(header, end='\n\n')
 
@@ -132,6 +143,7 @@ if __name__ == '__main__':
         reconnecting_flag = False
         for command in commands:
             client_command = Utilities.handle_command_parsing(command)
+
             if client_command[0].upper() == 'CLOSE':
                 client.send_close_message()
                 client.close()

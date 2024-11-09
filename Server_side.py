@@ -55,32 +55,36 @@ def handle_post_request(header, req_body, client_socket):
     print("File uploaded successfully")
     response = "HTTP/1.1 200 OK\r\n\r\nRequest handled successfully"
     client_socket.send(response.encode("utf-8"))
-
-
-def handle_get_request(header, client_socket):
-    requested_file = header.split(" ")[1]
-    print(f"Requested file: {requested_file}")
     
-    if requested_file == "/":
-        requested_file = "/index.html"
+def handle_get_request(header, client_socket):
+    requested_file = header.split(" ")[1].lstrip('/')# Strip leading slash to avoid root directory issues
+    
+    # Serve index.html if the root path or an empty path is requested
+    if requested_file in (''):
+        requested_file = 'index.html'
 
-    file_path = requested_file.lstrip('/')  # remove the leading forward slash to get the current directory
+    print (f"Requested file: {requested_file}")
+    file_path = os.path.join('Server_Directory', requested_file)  # Ensure it's within the server's directory
 
     try:
         # Determine the content type of the file
         content_type, _ = mimetypes.guess_type(file_path)
         if content_type is None:
-            content_type = 'application/octet-stream'  # raw data(binary data)
-        # Read the file content from the server directory and send it to the client
-        with open(os.path.join('Server_Directory', file_path), 'rb') as read_file:
+            content_type = 'application/octet-stream'
+
+        # Read and serve the file content
+        with open(file_path, 'rb') as read_file:
             file_content = read_file.read()
-        response = f'HTTP/1.1 200 OK\r\nContent-Type: {content_type}\r\n\r\n'.encode("utf-8") + file_content
+
+        # Send HTTP response headers and content
+        response_header = f"HTTP/1.1 200 OK\r\nContent-Type: {content_type}\r\n\r\n"
+        client_socket.sendall(response_header.encode("utf-8") + file_content)
+        print("File sent successfully")
 
     except FileNotFoundError:
         print(f"File not found: {requested_file}")
         response = "HTTP/1.1 404 Not Found\r\n\r\nFile Not Found"
-    print("File sent successfully")
-    client_socket.send(response if isinstance(response, bytes) else response.encode("utf-8"))
+        client_socket.sendall(response.encode("utf-8"))
 
 
 def handle_client(client_socket, client_address):
