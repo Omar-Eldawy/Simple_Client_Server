@@ -111,7 +111,7 @@ def handle_client(client_socket, client_address):
                 client_socket.send("closed".encode("utf-8"))  # encode the string to bytes before sending
                 break
 
-            # print(f"Received from {client_address[0]}:{client_address[1]}: {request}")
+            print(f"Received from {client_address[0]}:{client_address[1]}: {request}")
             command = header.split(" ")[0]
             # Direct the request to the appropriate handler
             if command == "GET":
