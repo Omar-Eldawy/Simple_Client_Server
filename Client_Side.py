@@ -97,7 +97,7 @@ class Client:
         elif '200 OK' in header:
             print(header)
             
-            # Handle the root (/) case by using a different name, like "root_response.html"
+            # Handle the root (/) case by using a different name, like "index.html"
             save_file_name = 'index.html' if file_name == '/' else file_name
             file_path = os.path.join('Client_Directory', save_file_name)
 
