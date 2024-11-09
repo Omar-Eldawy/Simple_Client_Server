@@ -1,10 +1,6 @@
-import socket
 import mimetypes
 import os
-import sys
-
-import Utilities
-from Utilities import parse_args, validate_file
+import socket
 
 
 class Client:
@@ -67,7 +63,7 @@ class Client:
         self.__client.sendall(request_header.encode('utf-8') + file_data)
         response = self.__client.recv(self.__file_size)
         print(response.decode('utf-8'), end='\n\n')
-        
+
     def __get_file(self, file_name: str) -> None:
         # Check if the client directory exists, if not create it
         if not os.path.exists('Client_Directory'):
@@ -96,7 +92,7 @@ class Client:
             return
         elif '200 OK' in header:
             print(header)
-            
+
             # Handle the root (/) case by using a different name, like "index.html"
             save_file_name = 'index.html' if file_name == '/' else file_name
             file_path = os.path.join('Client_Directory', save_file_name)
@@ -116,45 +112,3 @@ class Client:
 
     def send_close_message(self):
         self.__client.send("CLOSE".encode('utf-8'))
-
-
-if __name__ == '__main__':
-    args = parse_args()
-    client = Client(args.server_ip, args.port_number)
-    reconnecting_flag = False
-    commands = None
-    while True:
-        if not reconnecting_flag:
-            file_path = input('Enter commands file path or Close to terminate:')
-
-            if file_path.upper() == 'CLOSE':
-                client.send_close_message()
-                client.close()
-                print('Connection closed')
-                sys.exit(0)
-
-            check_file_path = validate_file(file_path)
-            if check_file_path != 'File is valid':
-                print(check_file_path)
-                continue
-
-            commands = Utilities.read_file(file_path)
-
-        reconnecting_flag = False
-        for command in commands:
-            client_command = Utilities.handle_command_parsing(command)
-
-            if client_command[0].upper() == 'CLOSE':
-                client.send_close_message()
-                client.close()
-                print('Connection closed')
-                sys.exit(0)
-            if client_command[0].upper() not in ['POST', 'GET']:
-                print('Invalid Command')
-                continue
-            if not client.action(client_command[0].upper(), client_command[1]):
-                client = Client(args.server_ip, args.port_number)
-                reconnecting_flag = True
-                print('Reconnecting...', end='\n\n')
-                break
-

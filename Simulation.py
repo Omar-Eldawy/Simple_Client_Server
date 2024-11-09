@@ -40,7 +40,7 @@ class Simulation:
 # To run this file you need to comment the line reading the command line arguments in the Client_Side.py file
 # and change the self.__num_commands in the Simulation.py file to the number of commands in your commands file
 if __name__ == "__main__":
-    sim = Simulation([1, 3, 5, 7, 10, 15, 20, 25, 30, 50, 100, 200,400, 500,800, 1000], '../Client_Side.py')
+    sim = Simulation([1, 3, 5, 7, 10, 15, 20, 25, 30, 50, 100, 200,400, 500,800, 1000], 'Simulation_Client.py')
     average_throughput = sim.run()
     sim.draw(average_throughput)
 
