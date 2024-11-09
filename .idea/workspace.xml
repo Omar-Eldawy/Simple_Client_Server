@@ -5,7 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="8f56a3d8-c324-4f76-822a-5f5a49bc65cb" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Simulation.py" beforeDir="false" afterPath="$PROJECT_DIR$/Simulation.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Client_Directory/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/Client_Directory/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Client_Directory/walter_white.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/Client_Directory/walter_white.jpg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Client_Side.py" beforeDir="false" afterPath="$PROJECT_DIR$/Client_Side.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Server_Directory/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/Server_Directory/index.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -101,5 +104,16 @@
       <updated>1730418131084</updated>
     </task>
     <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
 </project>

@@ -97,13 +97,10 @@ class Client:
             save_file_name = 'index.html' if file_name == '/' else file_name
             file_path = os.path.join('Client_Directory', save_file_name)
 
-            # Check if file already exists before writing
-            if not os.path.exists(file_path):
-                with open(file_path, 'wb') as file:
-                    file.write(body)
-                    print(f'File downloaded successfully as {save_file_name}', end='\n\n')
-            else:
-                print(f'File {save_file_name} already exists.', end='\n\n')
+            with open(file_path, 'wb') as file:
+                file.write(body)
+                print(f'File downloaded successfully as {save_file_name}', end='\n\n')
+                
         else:
             print(header, end='\n\n')
 
